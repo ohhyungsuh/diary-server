@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: diary
+
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/diary
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create # 시작시 자동으로 테이블 삭제후 생성
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    org.hibernate.SQl: debug # log를 통해 JPA에서 생성한 쿼리 노출
+    org.hibernate.type: trace # log에 index까지 출력
+

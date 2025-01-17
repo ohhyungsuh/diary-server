@@ -1,3 +1,21 @@
+### Gradle ###
+.gradle
+**/build/
+!src/**/build/
+!gradle-wrapper.jar
+gradle-app.setting
+
+# Cache of project
+.gradletasknamecache
+
+### Intellij ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+HELP.md
+
 # Compiled class file
 *.class
 
@@ -6,6 +24,12 @@
 
 # BlueJ files
 *.ctxt
+
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
