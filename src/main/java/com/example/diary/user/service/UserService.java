@@ -2,6 +2,7 @@ package com.example.diary.user.service;
 
 import com.example.diary.user.domain.User;
 import com.example.diary.user.dto.LoginDto;
+import com.example.diary.user.dto.ProfileDto;
 import com.example.diary.user.dto.SignupDto;
 import com.example.diary.user.dto.UserDto;
 import com.example.diary.user.exception.UserErrorCode;
@@ -60,6 +61,13 @@ public class UserService {
         session.setMaxInactiveInterval(SessionConst.USER_ID.getExpiration());
 
         return modelMapper.map(user, UserDto.class);
+    }
+
+    public ProfileDto getMyProfile(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.INVALID_LOGIN_ID));
+
+        return modelMapper.map(user, ProfileDto.class);
     }
 
     private void isLoginIdExists(SignupDto signupDto) {
