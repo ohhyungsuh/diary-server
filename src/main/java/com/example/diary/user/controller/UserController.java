@@ -45,4 +45,10 @@ public class UserController {
         return new ApiResponse<>(HttpStatus.OK);
     }
 
+    @DeleteMapping
+    public ApiResponse<?> resign(HttpServletRequest request) {
+        Long userId = SessionUtils.getUserIdBySession(request);
+        userService.resign(userId);
+        return new ApiResponse<>(HttpStatus.OK);
+    }
 }
