@@ -41,8 +41,7 @@ public class UserController {
 
     @PostMapping("/logout")
     public ApiResponse<?> logout(HttpServletRequest request) {
-        Long userId = SessionUtils.getUserIdBySession(request);
-        userService.logout(userId);
+        userService.logout(request.getSession());
         return new ApiResponse<>(HttpStatus.OK);
     }
 
