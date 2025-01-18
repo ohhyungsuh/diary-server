@@ -2,6 +2,7 @@ package com.example.diary.user.controller;
 
 import com.example.diary.global.response.ApiResponse;
 import com.example.diary.user.dto.LoginDto;
+import com.example.diary.user.dto.ProfileDto;
 import com.example.diary.user.dto.SignupDto;
 import com.example.diary.user.dto.UserDto;
 import com.example.diary.user.service.UserService;
@@ -10,10 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +30,13 @@ public class UserController {
     public ApiResponse<UserDto> login(@RequestBody @Valid LoginDto loginDto, HttpServletRequest request) {
         UserDto userDto = userService.login(loginDto, request);
         return new ApiResponse<>(HttpStatus.OK, userDto);
+    }
+
+    @GetMapping("/my-profile")
+    public ApiResponse<ProfileDto> getMyProfile(HttpServletRequest request) {
+        Long userId = SessionUtils.getUserIdBySession(request);
+        ProfileDto profileDto = userService.getMyProfile(userId);
+        return new ApiResponse<>(HttpStatus.OK, profileDto);
     }
 
 }
