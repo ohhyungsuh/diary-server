@@ -70,6 +70,12 @@ public class UserService {
         return modelMapper.map(user, ProfileDto.class);
     }
 
+    public void logout(HttpSession session) {
+        if(session != null) {
+            session.invalidate();
+        }
+    }
+
     private void isLoginIdExists(SignupDto signupDto) {
         if (userRepository.existsByLoginId(signupDto.getLoginId())) {
             throw new UserException(UserErrorCode.DUPLICATE_LOGIN_ID);

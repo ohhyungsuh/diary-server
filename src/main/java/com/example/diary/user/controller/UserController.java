@@ -39,4 +39,10 @@ public class UserController {
         return new ApiResponse<>(HttpStatus.OK, profileDto);
     }
 
+    @PostMapping("/logout")
+    public ApiResponse<?> logout(HttpServletRequest request) {
+        userService.logout(request.getSession());
+        return new ApiResponse<>(HttpStatus.OK);
+    }
+
 }
