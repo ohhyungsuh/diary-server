@@ -51,7 +51,7 @@ public class UserService {
         User user = userRepository.findByLoginId(loginDto.getLoginId())
                 .orElseThrow(() -> new UserException(UserErrorCode.INVALID_LOGIN_ID));
 
-        if(!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
             throw new UserException(UserErrorCode.INVALID_PASSWORD);
         }
 
@@ -71,9 +71,17 @@ public class UserService {
     }
 
     public void logout(HttpSession session) {
-        if(session != null) {
+        if (session != null) {
             session.invalidate();
         }
+    }
+
+    @Transactional
+    public void resign(Long userId) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.INVALID_LOGIN_ID));
+
+        userRepository.deleteById(userId);
     }
 
     private void isLoginIdExists(SignupDto signupDto) {
