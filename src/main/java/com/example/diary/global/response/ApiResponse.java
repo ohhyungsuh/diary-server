@@ -56,7 +56,7 @@ public class ApiResponse<T> {
             this.message = errorCode.getMessage();
         }
 
-        // 정상 응답 반환(OK, CREATED, ACCEPTED 등)
+        // 일반 응답 반환(OK, CREATED, ACCEPTED 등)
         public Status(HttpStatus httpStatus) {
             this.code = httpStatus.value();
             this.message = httpStatus.getReasonPhrase();
