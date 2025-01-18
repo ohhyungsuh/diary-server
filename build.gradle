@@ -39,6 +39,7 @@ dependencies {
 	// util
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	implementation 'org.modelmapper:modelmapper:3.1.1'
+	implementation 'org.springframework.security:spring-security-crypto'
 
 	/*
 	// security(아직 사용 안 함)
