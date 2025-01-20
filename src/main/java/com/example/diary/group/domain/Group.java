@@ -20,4 +20,6 @@ public class Group extends BaseTimeEntity {
 
     @Column(nullable = false)
     private String description;
+
+
 }

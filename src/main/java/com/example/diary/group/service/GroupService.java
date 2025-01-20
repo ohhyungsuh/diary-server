@@ -2,6 +2,7 @@ package com.example.diary.group.service;
 
 import com.example.diary.group.domain.Group;
 import com.example.diary.group.domain.dto.CreateGroupDto;
+import com.example.diary.group.domain.dto.GroupDetailDto;
 import com.example.diary.group.domain.dto.GroupDto;
 import com.example.diary.group.exception.GroupErrorCode;
 import com.example.diary.group.exception.GroupException;
@@ -20,6 +21,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -33,8 +36,7 @@ public class GroupService {
 
     @Transactional
     public GroupDto createGroup(Long userId, CreateGroupDto createGroupDto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.INVALID_LOGIN_ID));
+        User user = validateUserId(userId);
 
         if (groupRepository.existsByName(createGroupDto.getName())) {
             throw new GroupException(GroupErrorCode.DUPLICATE_GROUP_NAME);
@@ -59,5 +61,55 @@ public class GroupService {
         return modelMapper.map(group, GroupDto.class);
     }
 
+    // todo fetch join 필요
+    public List<GroupDto> getGroups() {
+        return groupRepository.findAll().stream()
+                .map(group -> modelMapper.map(group, GroupDto.class))
+                .toList();
+    }
 
+    // todo fetch join 필요
+    public List<GroupDto> getMyGroups(Long userId) {
+        validateUserId(userId);
+
+        return userGroupRepository.findByUserId(userId).stream()
+                .map(userGroup -> modelMapper.map(userGroup.getGroup(), GroupDto.class))
+                .toList();
+    }
+
+    public GroupDetailDto getGroupDetail(Long userId, Long groupId) {
+        validateUserId(userId);
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new GroupException(GroupErrorCode.INVALID_GROUP_ID));
+
+        // todo fetch join 필요
+        List<UserGroup> userGroups = userGroupRepository.findByGroupId(groupId);
+
+        User owner = userGroups.stream()
+                .filter(userGroup -> userGroup.getRole().equals(Role.OWNER))
+                .findFirst()
+                .get()
+                .getUser();
+
+        Status status = userGroups.stream()
+                .filter(userGroup -> userGroup.getUser().getId().equals(userId))
+                .map(UserGroup::getStatus)
+                .findFirst()
+                .orElse(Status.NOT_JOIN);
+
+        log.info("service-------------");
+        log.info("status: {}", status);
+        return new GroupDetailDto(
+                modelMapper.map(group, GroupDetailDto.GroupInfo.class),
+                modelMapper.map(owner, GroupDetailDto.OwnerInfo.class),
+                status
+        );
+
+    }
+
+    private User validateUserId(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.INVALID_LOGIN_ID));
+    }
 }
