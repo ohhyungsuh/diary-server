@@ -1,12 +1,16 @@
 ### Gradle ###
 .gradle
 **/build/
+/out
 !src/**/build/
 !gradle-wrapper.jar
 gradle-app.setting
 
 # Cache of project
 .gradletasknamecache
+
+# develop
+/src/main/resources/application-local.yml
 
 ### Intellij ###
 .idea
