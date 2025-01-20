@@ -1,10 +1,10 @@
 package com.example.diary.user.service;
 
 import com.example.diary.user.domain.User;
-import com.example.diary.user.dto.LoginDto;
-import com.example.diary.user.dto.ProfileDto;
-import com.example.diary.user.dto.SignupDto;
-import com.example.diary.user.dto.UserDto;
+import com.example.diary.user.domain.dto.LoginDto;
+import com.example.diary.user.domain.dto.ProfileDto;
+import com.example.diary.user.domain.dto.SignupDto;
+import com.example.diary.user.domain.dto.UserDto;
 import com.example.diary.user.exception.UserErrorCode;
 import com.example.diary.user.exception.UserException;
 import com.example.diary.user.repository.UserRepository;

@@ -1,9 +1,7 @@
 package com.example.diary.user.domain;
 
 import com.example.diary.global.entity.BaseTimeEntity;
-import com.example.diary.user.dto.SignupDto;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
