@@ -16,8 +16,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @Table(name = "user_group")
 public class UserGroup extends BaseTimeEntity {
 
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 
