@@ -2,12 +2,15 @@ package com.example.diary.user_group.controller;
 
 import com.example.diary.global.response.ApiResponse;
 import com.example.diary.user.session.SessionUtils;
+import com.example.diary.user_group.domain.dto.UserDto;
 import com.example.diary.user_group.domain.dto.UserGroupDto;
 import com.example.diary.user_group.service.UserGroupService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,8 +37,15 @@ public class UserGroupController {
     }
 
     // 그룹 내 인원 조회
+    @GetMapping("/{groupId}/users")
+    public ApiResponse<UserDto> getUsersInGroup(@PathVariable("groupId") Long groupId, HttpServletRequest request) {
+        SessionUtils.getUserIdBySession(request);
+        List<UserDto> users = userGroupService.getUsersInGroup(groupId);
+        return new ApiResponse<>(HttpStatus.OK, users);
+    }
 
     // 그룹 나가기
+
 
     // 가입 요청 들어온 사용자 조회
 

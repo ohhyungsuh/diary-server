@@ -11,6 +11,7 @@ import com.example.diary.user.repository.UserRepository;
 import com.example.diary.user_group.domain.Role;
 import com.example.diary.user_group.domain.Status;
 import com.example.diary.user_group.domain.UserGroup;
+import com.example.diary.user_group.domain.dto.UserDto;
 import com.example.diary.user_group.domain.dto.UserGroupDto;
 import com.example.diary.user_group.exception.UserGroupErrorCode;
 import com.example.diary.user_group.exception.UserGroupException;
@@ -20,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -68,6 +71,12 @@ public class UserGroupService {
         }
 
         userGroupRepository.deleteById(userGroup.getId());
+    }
+
+    public List<UserDto> getUsersInGroup(Long groupId) {
+        return userGroupRepository.findByGroupId(groupId).stream()
+                .map(userGroup -> modelMapper.map(userGroup.getUser(), UserDto.class))
+                .toList();
     }
 
     private User validateUserId(Long userId) {
