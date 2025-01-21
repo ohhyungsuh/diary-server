@@ -4,6 +4,7 @@ import com.example.diary.group.domain.Group;
 import com.example.diary.group.exception.GroupErrorCode;
 import com.example.diary.group.exception.GroupException;
 import com.example.diary.group.repository.GroupRepository;
+import com.example.diary.post.repository.PostRepository;
 import com.example.diary.user.domain.User;
 import com.example.diary.user.exception.UserErrorCode;
 import com.example.diary.user.exception.UserException;
@@ -34,6 +35,7 @@ public class UserGroupService {
     private final UserGroupRepository userGroupRepository;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
+    private final PostRepository postRepository;
 
     private final ModelMapper modelMapper;
 
@@ -46,7 +48,7 @@ public class UserGroupService {
         Optional<UserGroup> findUserGroup = userGroupRepository.findByUserIdAndGroupId(userId, groupId);
         if (findUserGroup.isPresent()) {
             if (findUserGroup.get().getStatus().equals(Status.DENY)) {
-                throw new UserGroupException(UserGroupErrorCode.DUPLICATE_USER_GROUP);
+                throw new UserGroupException(UserGroupErrorCode.DENY_USER);
             }
             throw new UserGroupException(UserGroupErrorCode.DUPLICATE_USER_GROUP);
         }
@@ -62,7 +64,6 @@ public class UserGroupService {
     }
 
     // user, group 까지 찾아서 예외 처리를 해야되는게 맞나? 맞는 거 같긴 한데, 이유가 그럼 데이터 불일치할까봐?
-    // todo user 관련된 post도 삭제
     @Transactional
     public void deleteJoinGroup(Long userId, Long groupId) {
         validateUserId(userId);
@@ -83,13 +84,20 @@ public class UserGroupService {
     }
 
     // 그룹 내 인원 조회
-    public List<UserDto> getUsersInGroup(Long groupId) {
+    public List<UserDto> getUsersInGroup(Long userId, Long groupId) {
+        UserGroup findUserGroup = validateUserGroup(userId, groupId);
+
+        if (!findUserGroup.getStatus().equals(Status.JOIN)) {
+            throw new UserGroupException(UserGroupErrorCode.UNAUTHORIZED_ROLE);
+        }
+
         return userGroupRepository.findByGroupId(groupId).stream()
                 .map(userGroup -> modelMapper.map(userGroup.getUser(), UserDto.class))
                 .toList();
     }
 
     // 방장은 방을 나갈 수 없고, 그룹 삭제만 가능
+    // todo 최적화 필요
     @Transactional
     public void leaveGroup(Long userId, Long groupId) {
         validateUserId(userId);
@@ -105,6 +113,7 @@ public class UserGroupService {
         if (userGroup.getRole().equals(Role.OWNER)) {
             throw new UserGroupException(UserGroupErrorCode.INVALID_ROLE);
         }
+        postRepository.deleteAllByGroupId(groupId);
 
         userGroupRepository.deleteById(userGroup.getId());
     }
@@ -126,10 +135,10 @@ public class UserGroupService {
     }
 
     // 가입 요청 수락은 방장 + 매니저 가능
+    @Transactional
     public void acceptJoinUser(Long adminId, Long userId, Long groupId) {
         validateUserId(adminId);
         validateUserId(userId);
-
         UserGroup admin = validateUserGroup(adminId, groupId);
 
         if (admin.getRole().equals(Role.MEMBER)) {
@@ -159,10 +168,15 @@ public class UserGroupService {
 
         UserGroup userGroup = validateUserGroup(userId, groupId);
 
+        if (!userGroup.getStatus().equals(Status.PENDING)) {
+            throw new UserGroupException(UserGroupErrorCode.ALREADY_JOINED);
+        }
+
         userGroupRepository.deleteById(userGroup.getId());
     }
 
     // 추방은 방장만 가능
+    @Transactional
     public void expelUser(Long adminId, Long userId, Long groupId) {
         validateUserId(adminId);
         validateUserId(userId);
@@ -175,10 +189,13 @@ public class UserGroupService {
 
         UserGroup userGroup = validateUserGroup(userId, groupId);
 
+        // 추방당하면 관련된 글은? 그룹 나가는건 다 삭제하게함
+
         userGroup.expelUser();
     }
 
     // 매니저 승진은 방장만 가능
+    @Transactional
     public void updateUser(Long adminId, Long userId, Long groupId) {
         validateUserId(adminId);
         validateUserId(userId);
@@ -190,7 +207,7 @@ public class UserGroupService {
         }
 
         UserGroup userGroup = validateUserGroup(userId, groupId);
-        if(!userGroup.getRole().equals(Role.MEMBER) || !userGroup.getStatus().equals(Status.JOIN)) {
+        if (!userGroup.getRole().equals(Role.MEMBER) || !userGroup.getStatus().equals(Status.JOIN)) {
             throw new UserGroupException(UserGroupErrorCode.INVALID_UPDATE_ROLE);
         }
 
@@ -198,6 +215,7 @@ public class UserGroupService {
     }
 
     // 매니저 강등은 방장만 가능
+    @Transactional
     public void demoteUser(Long adminId, Long userId, Long groupId) {
         validateUserId(adminId);
         validateUserId(userId);
@@ -209,7 +227,7 @@ public class UserGroupService {
         }
 
         UserGroup userGroup = validateUserGroup(userId, groupId);
-        if(!userGroup.getRole().equals(Role.MANAGER) || !userGroup.getStatus().equals(Status.JOIN)) {
+        if (!userGroup.getRole().equals(Role.MANAGER) || !userGroup.getStatus().equals(Status.JOIN)) {
             throw new UserGroupException(UserGroupErrorCode.INVALID_UPDATE_ROLE);
         }
 

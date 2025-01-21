@@ -58,6 +58,8 @@ public class PostService {
                 .group(group)
                 .build();
 
+        postRepository.save(post);
+
         return modelMapper.map(post, PostDto.class);
     }
 
@@ -86,6 +88,7 @@ public class PostService {
         return modelMapper.map(post, PostDetailDto.class);
     }
 
+    @Transactional
     public PostDto updatePost(Long userId, Long groupId, Long postId, WritePostDto writePostDto) {
         validateUserId(userId);
         validateGroupId(groupId);

@@ -17,13 +17,13 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/posts")
+@RequestMapping("/api/v1/posts/{groupId}")
 public class PostController {
 
     private final PostService postService;
 
     // 게시글 작성
-    @PostMapping("/{groupId}")
+    @PostMapping
     public ApiResponse<PostDto> createPost(@PathVariable("groupId") Long groupId,
                                            @RequestBody WritePostDto writePostDto, HttpServletRequest request) {
         Long userId = SessionUtils.getUserIdBySession(request);
@@ -32,7 +32,7 @@ public class PostController {
     }
 
     // 게시글 전체 조회
-    @GetMapping("/{groupId}")
+    @GetMapping
     public ApiResponse<PostDto> getPosts(@PathVariable("groupId") Long groupId, HttpServletRequest request) {
         Long userId = SessionUtils.getUserIdBySession(request);
         List<PostDto> posts = postService.getPosts(userId, groupId);
@@ -40,7 +40,7 @@ public class PostController {
     }
 
     // 게시글 조회
-    @GetMapping("/{groupId}/posts/{postId}")
+    @GetMapping("/{postId}")
     public ApiResponse<PostDetailDto> getPost(@PathVariable("groupId") Long groupId,
                                               @PathVariable("postId") Long postId, HttpServletRequest request) {
         Long userId = SessionUtils.getUserIdBySession(request);
@@ -49,7 +49,7 @@ public class PostController {
     }
 
     // 게시글 수정
-    @PostMapping("/{groupId}/posts/{postId}")
+    @PutMapping("/{postId}")
     public ApiResponse<PostDto> updatePost(@PathVariable("groupId") Long groupId,
                                            @PathVariable("postId") Long postId,
                                            @RequestBody WritePostDto writePostDto, HttpServletRequest request) {
@@ -59,7 +59,7 @@ public class PostController {
     }
 
     // 게시글 삭제
-    @DeleteMapping("/{groupId}/posts/{postId}")
+    @DeleteMapping("/{postId}")
     public ApiResponse<?> deletePost(@PathVariable("groupId") Long groupId,
                                            @PathVariable("postId") Long postId, HttpServletRequest request) {
         Long userId = SessionUtils.getUserIdBySession(request);
@@ -68,7 +68,7 @@ public class PostController {
     }
 
     // 게시글 전체 삭제
-    @DeleteMapping("/{groupId}/posts")
+    @DeleteMapping
     public ApiResponse<?> deleteAllPost(@PathVariable("groupId") Long groupId, HttpServletRequest request) {
         Long userId = SessionUtils.getUserIdBySession(request);
         postService.deleteAllPost(userId, groupId);
@@ -78,7 +78,7 @@ public class PostController {
     // todo 게시글 선택 삭제
 
     // 게시글 강제 삭제
-    @DeleteMapping("/{groupId}/posts/{postId}/force")
+    @DeleteMapping("/{postId}/force")
     public ApiResponse<?> deletePostByForce(@PathVariable("groupId") Long groupId,
                                      @PathVariable("postId") Long postId, HttpServletRequest request) {
         Long adminId = SessionUtils.getUserIdBySession(request);

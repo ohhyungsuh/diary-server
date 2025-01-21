@@ -37,10 +37,11 @@ public class UserGroupController {
     }
 
     // 그룹 내 인원 조회
+    // 수정 필요
     @GetMapping("/{groupId}/users")
     public ApiResponse<UserDto> getUsersInGroup(@PathVariable("groupId") Long groupId, HttpServletRequest request) {
-        SessionUtils.getUserIdBySession(request);
-        List<UserDto> users = userGroupService.getUsersInGroup(groupId);
+        Long userId = SessionUtils.getUserIdBySession(request);
+        List<UserDto> users = userGroupService.getUsersInGroup(userId, groupId);
         return new ApiResponse<>(HttpStatus.OK, users);
     }
 
@@ -61,6 +62,7 @@ public class UserGroupController {
     }
 
     // 그룹 가입 요청 수락
+    // 업데이트 안 됨
     @PutMapping("/{groupId}/users/join/{userId}/accept")
     public ApiResponse<?> acceptJoinUser(@PathVariable("groupId") Long groupId, @PathVariable("userId") Long userId, HttpServletRequest request) {
         Long adminId = SessionUtils.getUserIdBySession(request);
