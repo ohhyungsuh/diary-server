@@ -66,6 +66,10 @@ public class UserGroupService {
         UserGroup userGroup = userGroupRepository.findByUserIdAndGroupId(userId, groupId)
                 .orElseThrow(() -> new UserGroupException(UserGroupErrorCode.INVALID_USER_AND_GROUP_ID));
 
+        if(!userGroup.getStatus().equals(Status.PENDING)) {
+            throw new UserGroupException(UserGroupErrorCode.INVALID_STATUS);
+        }
+
         if (userGroup.getRole().equals(Role.OWNER) || userGroup.getRole().equals(Role.MANAGER)) {
             throw new UserGroupException(UserGroupErrorCode.UNAUTHORIZED_ROLE);
         }
