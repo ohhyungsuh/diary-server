@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserGroupRepository extends JpaRepository<UserGroup, Long> {
-    List<UserGroup> findByUserId(Long userId);
+
+    @Query("select ug from UserGroup ug join fetch ug.group where ug.user.id = :userId")
+    List<UserGroup> findByUserId(@Param("userId") Long userId);
+
     List<UserGroup> findByGroupId(Long groupId);
 
-//    @Query("SELECT ug FROM UserGroup ug JOIN FETCH ug.user WHERE ug.group.id = :groupId")
-//    List<UserGroup> findByGroupId(@Param("groupId") Long groupId);
+    void deleteByGroupId(Long groupId);
 
 }

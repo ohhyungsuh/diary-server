@@ -53,12 +53,14 @@ public class GroupController {
     public ApiResponse<GroupDetailDto> getGroupDetail(@PathVariable("groupId") Long groupId, HttpServletRequest request) {
         Long userId = SessionUtils.getUserIdBySession(request);
         GroupDetailDto groupDetailDto = groupService.getGroupDetail(userId, groupId);
-        log.info("controller--------------------");
-        log.info("userID: {}, groupId: {}", userId, groupId);
-        log.info("group: {}, {}", groupDetailDto.getGroup().getName(), groupDetailDto.getGroup().getDescription());
-        log.info("status: {}", groupDetailDto.getStatus());
         return new ApiResponse<>(HttpStatus.OK, groupDetailDto);
     }
 
     // 그룹 삭제
+    @DeleteMapping("/{groupId}")
+    public ApiResponse<?> deleteGroup(@PathVariable("groupId") Long groupId, HttpServletRequest request) {
+        SessionUtils.getUserIdBySession(request);
+        groupService.deleteGroup(groupId);
+        return new ApiResponse<>(HttpStatus.OK);
+    }
 }

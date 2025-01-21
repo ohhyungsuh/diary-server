@@ -61,14 +61,12 @@ public class GroupService {
         return modelMapper.map(group, GroupDto.class);
     }
 
-    // todo fetch join 필요
     public List<GroupDto> getGroups() {
         return groupRepository.findAll().stream()
                 .map(group -> modelMapper.map(group, GroupDto.class))
                 .toList();
     }
 
-    // todo fetch join 필요
     public List<GroupDto> getMyGroups(Long userId) {
         validateUserId(userId);
 
@@ -83,7 +81,7 @@ public class GroupService {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupException(GroupErrorCode.INVALID_GROUP_ID));
 
-        // todo fetch join 필요
+        // fetch join 필요 없음. groupId로 조회하면 쿼리문에 left join됨
         List<UserGroup> userGroups = userGroupRepository.findByGroupId(groupId);
 
         User owner = userGroups.stream()
@@ -98,14 +96,18 @@ public class GroupService {
                 .findFirst()
                 .orElse(Status.NOT_JOIN);
 
-        log.info("service-------------");
-        log.info("status: {}", status);
         return new GroupDetailDto(
                 modelMapper.map(group, GroupDetailDto.GroupInfo.class),
                 modelMapper.map(owner, GroupDetailDto.OwnerInfo.class),
                 status
         );
 
+    }
+
+    // todo soft delete 하게된다면?
+    public void deleteGroup(Long groupId) {
+        userGroupRepository.deleteByGroupId(groupId);
+        groupRepository.deleteById(groupId);
     }
 
     private User validateUserId(Long userId) {
