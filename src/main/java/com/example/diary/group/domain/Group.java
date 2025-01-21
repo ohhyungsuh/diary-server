@@ -12,7 +12,7 @@ import lombok.*;
 @Table(name = "groups")
 public class Group extends BaseTimeEntity {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
