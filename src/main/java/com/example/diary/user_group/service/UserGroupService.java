@@ -79,6 +79,22 @@ public class UserGroupService {
                 .toList();
     }
 
+    @Transactional
+    public void leaveGroup(Long userId, Long groupId) {
+        UserGroup userGroup = userGroupRepository.findByUserIdAndGroupId(userId, groupId)
+                .orElseThrow(() -> new UserGroupException(UserGroupErrorCode.INVALID_USER_AND_GROUP_ID));
+
+        if(!userGroup.getStatus().equals(Status.JOIN)) {
+            throw new UserGroupException(UserGroupErrorCode.INVALID_STATUS);
+        }
+
+        if(userGroup.getRole().equals(Role.OWNER)) {
+            throw new UserGroupException(UserGroupErrorCode.INVALID_ROLE);
+        }
+
+        userGroupRepository.deleteById(userGroup.getId());
+    }
+
     private User validateUserId(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.INVALID_LOGIN_ID));

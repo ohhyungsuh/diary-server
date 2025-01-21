@@ -21,7 +21,7 @@ public class UserGroupController {
 
     // todo 알림 테이블 만들어서 실시간 알람 기능 만들어보기
     // 그룹 가입 요청
-    @PostMapping("/{groupId}")
+    @PostMapping("/{groupId}/join")
     public ApiResponse<UserGroupDto> joinGroup(@PathVariable("groupId") Long groupId, HttpServletRequest request) {
         Long userId = SessionUtils.getUserIdBySession(request);
         UserGroupDto userGroupDto = userGroupService.joinGroup(userId, groupId);
@@ -29,7 +29,7 @@ public class UserGroupController {
     }
 
     // 그룹 가입 요청 삭제
-    @DeleteMapping("/{groupId}")
+    @DeleteMapping("/{groupId}/delete")
     public ApiResponse<?> deleteJoinGroup(@PathVariable("groupId") Long groupId, HttpServletRequest request) {
         Long userId = SessionUtils.getUserIdBySession(request);
         userGroupService.deleteJoinGroup(userId, groupId);
@@ -45,7 +45,12 @@ public class UserGroupController {
     }
 
     // 그룹 나가기
-
+    @DeleteMapping("/{groupId}/leave")
+    public ApiResponse<?> leaveGroup(@PathVariable("groupId") Long groupId, HttpServletRequest request) {
+        Long userId = SessionUtils.getUserIdBySession(request);
+        userGroupService.leaveGroup(userId, groupId);
+        return new ApiResponse<>(HttpStatus.OK);
+    }
 
     // 가입 요청 들어온 사용자 조회
 
