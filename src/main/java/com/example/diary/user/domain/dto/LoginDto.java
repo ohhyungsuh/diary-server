@@ -1,4 +1,4 @@
-package com.example.diary.user.dto;
+package com.example.diary.user.domain.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

@@ -1,4 +1,4 @@
-package com.example.diary.user.dto;
+package com.example.diary.user.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
