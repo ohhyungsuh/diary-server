@@ -14,8 +14,11 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, Long> {
     @Query("select ug from UserGroup ug join fetch ug.group where ug.user.id = :userId")
     List<UserGroup> findByUserId(@Param("userId") Long userId);
 
+    @Query("select ug from UserGroup ug join fetch ug.user where ug.group.id = :gropuId")
     List<UserGroup> findByGroupId(Long groupId);
 
-    void deleteByGroupId(Long groupId);
+    void deleteAllByGroupId(Long groupId);
+
+    Optional<UserGroup> findByUserIdAndGroupId(Long userId, Long groupId);
 
 }

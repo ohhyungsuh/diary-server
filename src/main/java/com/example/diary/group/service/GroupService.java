@@ -14,6 +14,8 @@ import com.example.diary.user.repository.UserRepository;
 import com.example.diary.user_group.domain.Role;
 import com.example.diary.user_group.domain.Status;
 import com.example.diary.user_group.domain.UserGroup;
+import com.example.diary.user_group.exception.UserGroupErrorCode;
+import com.example.diary.user_group.exception.UserGroupException;
 import com.example.diary.user_group.repository.UserGroupRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -106,8 +108,17 @@ public class GroupService {
 
     // todo soft delete 하게된다면?
     @Transactional
-    public void deleteGroup(Long groupId) {
-        userGroupRepository.deleteByGroupId(groupId);
+    public void deleteGroup(Long userId, Long groupId) {
+        validateUserId(userId);
+
+        UserGroup userGroup = userGroupRepository.findByUserIdAndGroupId(userId, groupId)
+                        .orElseThrow(() -> new UserGroupException(UserGroupErrorCode.INVALID_USER_AND_GROUP_ID));
+
+        if(!userGroup.getRole().equals(Role.OWNER)) {
+            throw new GroupException(GroupErrorCode.UNAUTHORIZED_ROLE);
+        }
+
+        userGroupRepository.deleteAllByGroupId(groupId);
         groupRepository.deleteById(groupId);
     }
 
