@@ -59,8 +59,8 @@ public class GroupController {
     // 그룹 삭제
     @DeleteMapping("/{groupId}")
     public ApiResponse<?> deleteGroup(@PathVariable("groupId") Long groupId, HttpServletRequest request) {
-        SessionUtils.getUserIdBySession(request);
-        groupService.deleteGroup(groupId);
+        Long userId = SessionUtils.getUserIdBySession(request);
+        groupService.deleteGroup(userId, groupId);
         return new ApiResponse<>(HttpStatus.OK);
     }
 }

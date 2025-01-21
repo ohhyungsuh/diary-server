@@ -53,14 +53,51 @@ public class UserGroupController {
     }
 
     // 가입 요청 들어온 사용자 조회
+    @GetMapping("/{groupId}/users/join")
+    public ApiResponse<UserDto> lookUpJoinUsers(@PathVariable("groupId") Long groupId, HttpServletRequest request) {
+        Long userId = SessionUtils.getUserIdBySession(request);
+        List<UserDto> users = userGroupService.lookUpJoinUsers(userId, groupId);
+        return new ApiResponse<>(HttpStatus.OK, users);
+    }
 
     // 그룹 가입 요청 수락
+    @PutMapping("/{groupId}/users/join/{userId}/accept")
+    public ApiResponse<?> acceptJoinUser(@PathVariable("groupId") Long groupId, @PathVariable("userId") Long userId, HttpServletRequest request) {
+        Long adminId = SessionUtils.getUserIdBySession(request);
+        userGroupService.acceptJoinUser(adminId, userId, groupId);
+        return new ApiResponse<>(HttpStatus.OK);
+    }
 
     // 그룹 가입 요청 거절
+    @DeleteMapping("/{groupId}/users/join/{userId}/reject")
+    public ApiResponse<?> rejectJoinUser(@PathVariable("groupId") Long groupId, @PathVariable("userId") Long userId, HttpServletRequest request) {
+        Long adminId = SessionUtils.getUserIdBySession(request);
+        userGroupService.rejectJoinUser(adminId, userId, groupId);
+        return new ApiResponse<>(HttpStatus.OK);
+    }
 
     // 그룹 내 인원 추방
+    @PutMapping("/{groupId}/users/{userId}/expel")
+    public ApiResponse<?> expelUser(@PathVariable("groupId") Long groupId, @PathVariable("userId") Long userId, HttpServletRequest request) {
+        Long adminId = SessionUtils.getUserIdBySession(request);
+        userGroupService.expelUser(adminId, userId, groupId);
+        return new ApiResponse<>(HttpStatus.OK);
+    }
 
     // 그룹 내 인원 매니저 승진
+    @PutMapping("/{groupId}/users/{userId}/update")
+    public ApiResponse<?> updateUser(@PathVariable("groupId") Long groupId, @PathVariable("userId") Long userId, HttpServletRequest request) {
+        Long adminId = SessionUtils.getUserIdBySession(request);
+        userGroupService.updateUser(adminId, userId, groupId);
+        return new ApiResponse<>(HttpStatus.OK);
+    }
 
     // 그룹 내 인원 일반 강등
+    @PutMapping("/{groupId}/users/{userId}/demote")
+    public ApiResponse<?> demoteUser(@PathVariable("groupId") Long groupId, @PathVariable("userId") Long userId, HttpServletRequest request) {
+        Long adminId = SessionUtils.getUserIdBySession(request);
+        userGroupService.demoteUser(adminId, userId, groupId);
+        return new ApiResponse<>(HttpStatus.OK);
+    }
+
 }
