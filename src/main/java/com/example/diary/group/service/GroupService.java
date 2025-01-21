@@ -105,6 +105,7 @@ public class GroupService {
     }
 
     // todo soft delete 하게된다면?
+    @Transactional
     public void deleteGroup(Long groupId) {
         userGroupRepository.deleteByGroupId(groupId);
         groupRepository.deleteById(groupId);
