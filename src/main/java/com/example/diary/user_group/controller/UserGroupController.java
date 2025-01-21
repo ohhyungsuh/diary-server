@@ -7,10 +7,7 @@ import com.example.diary.user_group.service.UserGroupService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +26,12 @@ public class UserGroupController {
     }
 
     // 그룹 가입 요청 삭제
+    @DeleteMapping("/{groupId}")
+    public ApiResponse<?> deleteJoinGroup(@PathVariable("groupId") Long groupId, HttpServletRequest request) {
+        Long userId = SessionUtils.getUserIdBySession(request);
+        userGroupService.deleteJoinGroup(userId, groupId);
+        return new ApiResponse<>(HttpStatus.OK);
+    }
 
     // 그룹 내 인원 조회
 
