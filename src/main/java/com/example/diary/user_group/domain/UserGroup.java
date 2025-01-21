@@ -38,4 +38,21 @@ public class UserGroup extends BaseTimeEntity {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     private Status status = Status.PENDING;
+
+    public void updateRole() {
+        this.role = Role.MANAGER;
+    }
+
+    public void demoteRole() {
+        this.role = Role.MEMBER;
+    }
+
+    public void acceptUser() {
+        this.status = Status.JOIN;
+    }
+
+    public void expelUser() {
+        this.status = Status.DENY;
+    }
+
 }
