@@ -27,7 +27,7 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, Long> {
     @Query("SELECT g.id FROM UserGroup ug JOIN ug.group g WHERE ug.user.id = :userId")
     List<Long> findGroupIdsByUserId(@Param("userId") Long userId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("DELETE FROM UserGroup ug WHERE ug.group.id IN :groupIds")
     void deleteByGroupIds(@Param("groupIds") List<Long> groupIds);
 }

@@ -11,7 +11,7 @@ import java.util.List;
 public interface GroupRepository extends JpaRepository<Group, Long> {
     boolean existsByName(String name);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("DELETE FROM Group g WHERE g.id IN :groupIds")
     void deleteByGroupIds(@Param("groupIds") List<Long> groupIds);
 

@@ -17,7 +17,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     void deleteAllByUserId(Long userId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("DELETE FROM Post p WHERE p.group.id IN :groupIds")
     void deleteByGroupIds(@Param("groupIds") List<Long> groupIds);
 }
