@@ -62,6 +62,7 @@ public class UserGroupService {
     }
 
     // user, group 까지 찾아서 예외 처리를 해야되는게 맞나? 맞는 거 같긴 한데, 이유가 그럼 데이터 불일치할까봐?
+    // todo user 관련된 post도 삭제
     @Transactional
     public void deleteJoinGroup(Long userId, Long groupId) {
         validateUserId(userId);

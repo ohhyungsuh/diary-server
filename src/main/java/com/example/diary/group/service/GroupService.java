@@ -107,6 +107,7 @@ public class GroupService {
     }
 
     // todo soft delete 하게된다면?
+    // todo group 관련된 post도 삭제
     @Transactional
     public void deleteGroup(Long userId, Long groupId) {
         validateUserId(userId);

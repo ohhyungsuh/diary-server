@@ -76,6 +76,7 @@ public class UserService {
         }
     }
 
+    // todo user 관련된 post, group 삭제
     @Transactional
     public void resign(Long userId) {
         userRepository.findById(userId)
