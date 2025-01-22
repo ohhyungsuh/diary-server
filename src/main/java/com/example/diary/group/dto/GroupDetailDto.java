@@ -1,4 +1,4 @@
-package com.example.diary.group.domain.dto;
+package com.example.diary.group.dto;
 
 import com.example.diary.user_group.domain.Status;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,4 +1,4 @@
-package com.example.diary.post.domain.dto;
+package com.example.diary.post.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;

@@ -1,4 +1,4 @@
-package com.example.diary.group.domain.dto;
+package com.example.diary.group.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

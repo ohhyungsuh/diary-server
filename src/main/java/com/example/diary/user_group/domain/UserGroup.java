@@ -9,10 +9,8 @@ import lombok.*;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
-@Builder
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "user_group")
 public class UserGroup extends BaseTimeEntity {
 
@@ -29,21 +27,29 @@ public class UserGroup extends BaseTimeEntity {
     private Group group;
 
     @Column
-    @Builder.Default
     @Enumerated(EnumType.STRING)
-    private Role role = Role.MEMBER;
+    private GroupRole groupRole;
 
     @Column
-    @Builder.Default
     @Enumerated(EnumType.STRING)
-    private Status status = Status.PENDING;
+    private Status status;
+
+    @Builder
+    public UserGroup(User user, Group group, GroupRole groupRole, Status status) {
+        this.user = user;
+        this.group = group;
+
+        this.groupRole = groupRole != null ? groupRole : GroupRole.MEMBER;
+        this.status = status != null ? status : Status.PENDING;
+    }
+
 
     public void updateRole() {
-        this.role = Role.MANAGER;
+        this.groupRole = GroupRole.MANAGER;
     }
 
     public void demoteRole() {
-        this.role = Role.MEMBER;
+        this.groupRole = GroupRole.MEMBER;
     }
 
     public void acceptUser() {

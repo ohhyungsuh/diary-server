@@ -9,11 +9,11 @@ import com.example.diary.user.domain.User;
 import com.example.diary.user.exception.UserErrorCode;
 import com.example.diary.user.exception.UserException;
 import com.example.diary.user.repository.UserRepository;
-import com.example.diary.user_group.domain.Role;
+import com.example.diary.user_group.domain.GroupRole;
 import com.example.diary.user_group.domain.Status;
 import com.example.diary.user_group.domain.UserGroup;
-import com.example.diary.user_group.domain.dto.UserDto;
-import com.example.diary.user_group.domain.dto.UserGroupDto;
+import com.example.diary.user_group.dto.UserDto;
+import com.example.diary.user_group.dto.UserGroupDto;
 import com.example.diary.user_group.exception.UserGroupErrorCode;
 import com.example.diary.user_group.exception.UserGroupException;
 import com.example.diary.user_group.repository.UserGroupRepository;
@@ -41,9 +41,9 @@ public class UserGroupService {
 
     @Transactional
     public UserGroupDto joinGroup(Long userId, Long groupId) {
-        User user = validateUserId(userId);
+        User user = findUser(userId);
 
-        Group group = validateGroupId(groupId);
+        Group group = findGroup(groupId);
 
         Optional<UserGroup> findUserGroup = userGroupRepository.findByUserIdAndGroupId(userId, groupId);
         if (findUserGroup.isPresent()) {
@@ -66,17 +66,17 @@ public class UserGroupService {
     // user, group 까지 찾아서 예외 처리를 해야되는게 맞나? 맞는 거 같긴 한데, 이유가 그럼 데이터 불일치할까봐?
     @Transactional
     public void deleteJoinGroup(Long userId, Long groupId) {
-        validateUserId(userId);
+        findUser(userId);
 
-        validateGroupId(groupId);
+        findGroup(groupId);
 
-        UserGroup userGroup = validateUserGroup(userId, groupId);
+        UserGroup userGroup = findUserGroup(userId, groupId);
 
         if (!userGroup.getStatus().equals(Status.PENDING)) {
             throw new UserGroupException(UserGroupErrorCode.INVALID_STATUS);
         }
 
-        if (userGroup.getRole().equals(Role.OWNER) || userGroup.getRole().equals(Role.MANAGER)) {
+        if (userGroup.getGroupRole().equals(GroupRole.OWNER) || userGroup.getGroupRole().equals(GroupRole.MANAGER)) {
             throw new UserGroupException(UserGroupErrorCode.UNAUTHORIZED_ROLE);
         }
 
@@ -85,7 +85,7 @@ public class UserGroupService {
 
     // 그룹 내 인원 조회
     public List<UserDto> getUsersInGroup(Long userId, Long groupId) {
-        UserGroup findUserGroup = validateUserGroup(userId, groupId);
+        UserGroup findUserGroup = findUserGroup(userId, groupId);
 
         if (!findUserGroup.getStatus().equals(Status.JOIN)) {
             throw new UserGroupException(UserGroupErrorCode.UNAUTHORIZED_ROLE);
@@ -100,17 +100,17 @@ public class UserGroupService {
     // todo 최적화 필요
     @Transactional
     public void leaveGroup(Long userId, Long groupId) {
-        validateUserId(userId);
+        findUser(userId);
 
-        validateGroupId(groupId);
+        findGroup(groupId);
 
-        UserGroup userGroup = validateUserGroup(userId, groupId);
+        UserGroup userGroup = findUserGroup(userId, groupId);
 
         if (!userGroup.getStatus().equals(Status.JOIN)) {
             throw new UserGroupException(UserGroupErrorCode.INVALID_STATUS);
         }
 
-        if (userGroup.getRole().equals(Role.OWNER)) {
+        if (userGroup.getGroupRole().equals(GroupRole.OWNER)) {
             throw new UserGroupException(UserGroupErrorCode.INVALID_ROLE);
         }
         postRepository.deleteAllByGroupId(groupId);
@@ -120,11 +120,11 @@ public class UserGroupService {
 
     // 가입 요청 조회는 방장 + 매니저 가능
     public List<UserDto> lookUpJoinUsers(Long userId, Long groupId) {
-        validateUserId(userId);
+        findUser(userId);
 
-        UserGroup findUserGroup = validateUserGroup(userId, groupId);
+        UserGroup findUserGroup = findUserGroup(userId, groupId);
 
-        if (findUserGroup.getRole().equals(Role.MEMBER)) {
+        if (findUserGroup.getGroupRole().equals(GroupRole.MEMBER)) {
             throw new UserGroupException(UserGroupErrorCode.UNAUTHORIZED_ROLE);
         }
 
@@ -137,15 +137,15 @@ public class UserGroupService {
     // 가입 요청 수락은 방장 + 매니저 가능
     @Transactional
     public void acceptJoinUser(Long adminId, Long userId, Long groupId) {
-        validateUserId(adminId);
-        validateUserId(userId);
-        UserGroup admin = validateUserGroup(adminId, groupId);
+        findUser(adminId);
+        findUser(userId);
+        UserGroup admin = findUserGroup(adminId, groupId);
 
-        if (admin.getRole().equals(Role.MEMBER)) {
+        if (admin.getGroupRole().equals(GroupRole.MEMBER)) {
             throw new UserGroupException(UserGroupErrorCode.UNAUTHORIZED_ROLE);
         }
 
-        UserGroup userGroup = validateUserGroup(userId, groupId);
+        UserGroup userGroup = findUserGroup(userId, groupId);
 
         if (userGroup.getStatus().equals(Status.JOIN)) {
             throw new UserGroupException(UserGroupErrorCode.ALREADY_JOINED);
@@ -157,16 +157,16 @@ public class UserGroupService {
     // 가입 요청 거절은 방장 + 매니저 가능
     @Transactional
     public void rejectJoinUser(Long adminId, Long userId, Long groupId) {
-        validateUserId(adminId);
-        validateUserId(userId);
+        findUser(adminId);
+        findUser(userId);
 
-        UserGroup admin = validateUserGroup(adminId, groupId);
+        UserGroup admin = findUserGroup(adminId, groupId);
 
-        if (admin.getRole().equals(Role.MEMBER)) {
+        if (admin.getGroupRole().equals(GroupRole.MEMBER)) {
             throw new UserGroupException(UserGroupErrorCode.UNAUTHORIZED_ROLE);
         }
 
-        UserGroup userGroup = validateUserGroup(userId, groupId);
+        UserGroup userGroup = findUserGroup(userId, groupId);
 
         if (!userGroup.getStatus().equals(Status.PENDING)) {
             throw new UserGroupException(UserGroupErrorCode.ALREADY_JOINED);
@@ -178,16 +178,16 @@ public class UserGroupService {
     // 추방은 방장만 가능
     @Transactional
     public void expelUser(Long adminId, Long userId, Long groupId) {
-        validateUserId(adminId);
-        validateUserId(userId);
+        findUser(adminId);
+        findUser(userId);
 
-        UserGroup admin = validateUserGroup(adminId, groupId);
+        UserGroup admin = findUserGroup(adminId, groupId);
 
-        if (!admin.getRole().equals(Role.OWNER)) {
+        if (!admin.getGroupRole().equals(GroupRole.OWNER)) {
             throw new UserGroupException(UserGroupErrorCode.UNAUTHORIZED_ROLE);
         }
 
-        UserGroup userGroup = validateUserGroup(userId, groupId);
+        UserGroup userGroup = findUserGroup(userId, groupId);
 
         // 추방당하면 관련된 글은? 그룹 나가는건 다 삭제하게함
 
@@ -197,17 +197,17 @@ public class UserGroupService {
     // 매니저 승진은 방장만 가능
     @Transactional
     public void updateUser(Long adminId, Long userId, Long groupId) {
-        validateUserId(adminId);
-        validateUserId(userId);
+        findUser(adminId);
+        findUser(userId);
 
-        UserGroup admin = validateUserGroup(adminId, groupId);
+        UserGroup admin = findUserGroup(adminId, groupId);
 
-        if (!admin.getRole().equals(Role.OWNER)) {
+        if (!admin.getGroupRole().equals(GroupRole.OWNER)) {
             throw new UserGroupException(UserGroupErrorCode.UNAUTHORIZED_ROLE);
         }
 
-        UserGroup userGroup = validateUserGroup(userId, groupId);
-        if (!userGroup.getRole().equals(Role.MEMBER) || !userGroup.getStatus().equals(Status.JOIN)) {
+        UserGroup userGroup = findUserGroup(userId, groupId);
+        if (!userGroup.getGroupRole().equals(GroupRole.MEMBER) || !userGroup.getStatus().equals(Status.JOIN)) {
             throw new UserGroupException(UserGroupErrorCode.INVALID_UPDATE_ROLE);
         }
 
@@ -217,34 +217,34 @@ public class UserGroupService {
     // 매니저 강등은 방장만 가능
     @Transactional
     public void demoteUser(Long adminId, Long userId, Long groupId) {
-        validateUserId(adminId);
-        validateUserId(userId);
+        findUser(adminId);
+        findUser(userId);
 
-        UserGroup admin = validateUserGroup(adminId, groupId);
+        UserGroup admin = findUserGroup(adminId, groupId);
 
-        if (!admin.getRole().equals(Role.OWNER)) {
+        if (!admin.getGroupRole().equals(GroupRole.OWNER)) {
             throw new UserGroupException(UserGroupErrorCode.UNAUTHORIZED_ROLE);
         }
 
-        UserGroup userGroup = validateUserGroup(userId, groupId);
-        if (!userGroup.getRole().equals(Role.MANAGER) || !userGroup.getStatus().equals(Status.JOIN)) {
+        UserGroup userGroup = findUserGroup(userId, groupId);
+        if (!userGroup.getGroupRole().equals(GroupRole.MANAGER) || !userGroup.getStatus().equals(Status.JOIN)) {
             throw new UserGroupException(UserGroupErrorCode.INVALID_UPDATE_ROLE);
         }
 
         userGroup.demoteRole();
     }
 
-    private User validateUserId(Long userId) {
+    private User findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.INVALID_LOGIN_ID));
     }
 
-    private Group validateGroupId(Long groupId) {
+    private Group findGroup(Long groupId) {
         return groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupException(GroupErrorCode.INVALID_GROUP_ID));
     }
 
-    private UserGroup validateUserGroup(Long userId, Long groupId) {
+    private UserGroup findUserGroup(Long userId, Long groupId) {
         return userGroupRepository.findByUserIdAndGroupId(userId, groupId)
                 .orElseThrow(() -> new UserGroupException(UserGroupErrorCode.INVALID_USER_AND_GROUP_ID));
     }

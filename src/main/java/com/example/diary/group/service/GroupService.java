@@ -1,9 +1,9 @@
 package com.example.diary.group.service;
 
 import com.example.diary.group.domain.Group;
-import com.example.diary.group.domain.dto.CreateGroupDto;
-import com.example.diary.group.domain.dto.GroupDetailDto;
-import com.example.diary.group.domain.dto.GroupDto;
+import com.example.diary.group.dto.CreateGroupDto;
+import com.example.diary.group.dto.GroupDetailDto;
+import com.example.diary.group.dto.GroupDto;
 import com.example.diary.group.exception.GroupErrorCode;
 import com.example.diary.group.exception.GroupException;
 import com.example.diary.group.repository.GroupRepository;
@@ -12,7 +12,7 @@ import com.example.diary.user.domain.User;
 import com.example.diary.user.exception.UserErrorCode;
 import com.example.diary.user.exception.UserException;
 import com.example.diary.user.repository.UserRepository;
-import com.example.diary.user_group.domain.Role;
+import com.example.diary.user_group.domain.GroupRole;
 import com.example.diary.user_group.domain.Status;
 import com.example.diary.user_group.domain.UserGroup;
 import com.example.diary.user_group.exception.UserGroupErrorCode;
@@ -40,7 +40,7 @@ public class GroupService {
 
     @Transactional
     public GroupDto createGroup(Long userId, CreateGroupDto createGroupDto) {
-        User user = validateUserId(userId);
+        User user = findUser(userId);
 
         if (groupRepository.existsByName(createGroupDto.getName())) {
             throw new GroupException(GroupErrorCode.DUPLICATE_GROUP_NAME);
@@ -56,7 +56,7 @@ public class GroupService {
         UserGroup userGroup = UserGroup.builder()
                 .user(user)
                 .group(group)
-                .role(Role.OWNER)
+                .groupRole(GroupRole.OWNER)
                 .status(Status.JOIN)
                 .build();
 
@@ -72,7 +72,7 @@ public class GroupService {
     }
 
     public List<GroupDto> getMyGroups(Long userId) {
-        validateUserId(userId);
+        findUser(userId);
 
         return userGroupRepository.findByUserId(userId).stream()
                 .map(userGroup -> modelMapper.map(userGroup.getGroup(), GroupDto.class))
@@ -80,7 +80,7 @@ public class GroupService {
     }
 
     public GroupDetailDto getGroupDetail(Long userId, Long groupId) {
-        validateUserId(userId);
+        findUser(userId);
 
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupException(GroupErrorCode.INVALID_GROUP_ID));
@@ -89,7 +89,7 @@ public class GroupService {
         List<UserGroup> userGroups = userGroupRepository.findByGroupId(groupId);
 
         User owner = userGroups.stream()
-                .filter(userGroup -> userGroup.getRole().equals(Role.OWNER))
+                .filter(userGroup -> userGroup.getGroupRole().equals(GroupRole.OWNER))
                 .findFirst()
                 .get()
                 .getUser();
@@ -112,13 +112,13 @@ public class GroupService {
     // todo 최적화 필요
     @Transactional
     public void deleteGroup(Long userId, Long groupId) {
-        validateUserId(userId);
+        findUser(userId);
 
         // todo 에러 메세지 변경
         UserGroup userGroup = userGroupRepository.findByUserIdAndGroupId(userId, groupId)
-                        .orElseThrow(() -> new UserGroupException(UserGroupErrorCode.INVALID_USER_AND_GROUP_ID));
+                .orElseThrow(() -> new UserGroupException(UserGroupErrorCode.INVALID_USER_AND_GROUP_ID));
 
-        if(!userGroup.getRole().equals(Role.OWNER)) {
+        if (!userGroup.getGroupRole().equals(GroupRole.OWNER)) {
             throw new GroupException(GroupErrorCode.UNAUTHORIZED_ROLE);
         }
 
@@ -127,7 +127,7 @@ public class GroupService {
         groupRepository.deleteById(groupId);
     }
 
-    private User validateUserId(Long userId) {
+    private User findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.INVALID_LOGIN_ID));
     }

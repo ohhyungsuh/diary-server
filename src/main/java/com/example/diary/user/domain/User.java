@@ -13,10 +13,8 @@ import static jakarta.persistence.GenerationType.*;
 import static lombok.AccessLevel.*;
 
 @Getter
-@Builder
 @Entity
 @AllArgsConstructor(access = PRIVATE)
-@NoArgsConstructor(access = PROTECTED)
 @Table(name = "users")
 public class User extends BaseTimeEntity {
 
@@ -38,5 +36,14 @@ public class User extends BaseTimeEntity {
 
     @Column
     private LocalDate birth;
+
+    @Builder
+    public User(String loginId, String password, String nickname, String email, LocalDate birth) {
+        this.loginId = loginId;
+        this.password = password;
+        this.nickname = nickname;
+        this.email = email;
+        this.birth = birth;
+    }
 
 }

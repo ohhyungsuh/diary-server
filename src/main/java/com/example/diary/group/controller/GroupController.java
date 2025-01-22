@@ -1,9 +1,9 @@
 package com.example.diary.group.controller;
 
 import com.example.diary.global.response.ApiResponse;
-import com.example.diary.group.domain.dto.CreateGroupDto;
-import com.example.diary.group.domain.dto.GroupDetailDto;
-import com.example.diary.group.domain.dto.GroupDto;
+import com.example.diary.group.dto.CreateGroupDto;
+import com.example.diary.group.dto.GroupDetailDto;
+import com.example.diary.group.dto.GroupDto;
 import com.example.diary.group.service.GroupService;
 import com.example.diary.user.session.SessionUtils;
 import jakarta.servlet.http.HttpServletRequest;

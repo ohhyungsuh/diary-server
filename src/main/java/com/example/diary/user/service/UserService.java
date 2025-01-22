@@ -1,13 +1,12 @@
 package com.example.diary.user.service;
 
-import com.example.diary.group.domain.Group;
 import com.example.diary.group.repository.GroupRepository;
 import com.example.diary.post.repository.PostRepository;
 import com.example.diary.user.domain.User;
-import com.example.diary.user.domain.dto.LoginDto;
-import com.example.diary.user.domain.dto.ProfileDto;
-import com.example.diary.user.domain.dto.SignupDto;
-import com.example.diary.user.domain.dto.UserDto;
+import com.example.diary.user.dto.LoginDto;
+import com.example.diary.user.dto.ProfileDto;
+import com.example.diary.user.dto.SignupDto;
+import com.example.diary.user.dto.UserDto;
 import com.example.diary.user.exception.UserErrorCode;
 import com.example.diary.user.exception.UserException;
 import com.example.diary.user.repository.UserRepository;
@@ -73,7 +72,7 @@ public class UserService {
     }
 
     public ProfileDto getMyProfile(Long userId) {
-        User user = validateUserId(userId);
+        User user = findUser(userId);
 
         return modelMapper.map(user, ProfileDto.class);
     }
@@ -87,7 +86,7 @@ public class UserService {
     // todo soft delete인 경우?
     @Transactional
     public void resign(Long userId) {
-        validateUserId(userId);
+        findUser(userId);
 
         List<Long> groupIds = userGroupRepository.findGroupIdsByUserId(userId);
 
@@ -119,7 +118,7 @@ public class UserService {
         }
     }
 
-    private User validateUserId(Long userId) {
+    private User findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.INVALID_LOGIN_ID));
     }

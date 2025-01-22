@@ -1,11 +1,12 @@
-package com.example.diary.user_group.domain.dto;
+package com.example.diary.group.dto;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class UserGroupDto {
+public class GroupDto {
 
     private Long id;
     private String name;

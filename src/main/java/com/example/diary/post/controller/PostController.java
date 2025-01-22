@@ -1,9 +1,9 @@
 package com.example.diary.post.controller;
 
 import com.example.diary.global.response.ApiResponse;
-import com.example.diary.post.domain.dto.WritePostDto;
-import com.example.diary.post.domain.dto.PostDetailDto;
-import com.example.diary.post.domain.dto.PostDto;
+import com.example.diary.post.dto.WritePostDto;
+import com.example.diary.post.dto.PostDetailDto;
+import com.example.diary.post.dto.PostDto;
 import com.example.diary.post.service.PostService;
 import com.example.diary.user.session.SessionUtils;
 import jakarta.servlet.http.HttpServletRequest;

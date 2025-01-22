@@ -2,8 +2,8 @@ package com.example.diary.user_group.controller;
 
 import com.example.diary.global.response.ApiResponse;
 import com.example.diary.user.session.SessionUtils;
-import com.example.diary.user_group.domain.dto.UserDto;
-import com.example.diary.user_group.domain.dto.UserGroupDto;
+import com.example.diary.user_group.dto.UserDto;
+import com.example.diary.user_group.dto.UserGroupDto;
 import com.example.diary.user_group.service.UserGroupService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

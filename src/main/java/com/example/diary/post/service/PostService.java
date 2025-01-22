@@ -5,9 +5,9 @@ import com.example.diary.group.exception.GroupErrorCode;
 import com.example.diary.group.exception.GroupException;
 import com.example.diary.group.repository.GroupRepository;
 import com.example.diary.post.domain.Post;
-import com.example.diary.post.domain.dto.WritePostDto;
-import com.example.diary.post.domain.dto.PostDetailDto;
-import com.example.diary.post.domain.dto.PostDto;
+import com.example.diary.post.dto.WritePostDto;
+import com.example.diary.post.dto.PostDetailDto;
+import com.example.diary.post.dto.PostDto;
 import com.example.diary.post.exception.PostErrorCode;
 import com.example.diary.post.exception.PostException;
 import com.example.diary.post.repository.PostRepository;
@@ -15,7 +15,7 @@ import com.example.diary.user.domain.User;
 import com.example.diary.user.exception.UserErrorCode;
 import com.example.diary.user.exception.UserException;
 import com.example.diary.user.repository.UserRepository;
-import com.example.diary.user_group.domain.Role;
+import com.example.diary.user_group.domain.GroupRole;
 import com.example.diary.user_group.domain.Status;
 import com.example.diary.user_group.domain.UserGroup;
 import com.example.diary.user_group.exception.UserGroupErrorCode;
@@ -43,9 +43,9 @@ public class PostService {
 
     @Transactional
     public PostDto createPost(Long userId, Long groupId, WritePostDto writePostDto) {
-        User user = validateUserId(userId);
-        Group group = validateGroupId(groupId);
-        UserGroup userGroup = validateUserGroup(userId, groupId);
+        User user = findUser(userId);
+        Group group = findGroup(groupId);
+        UserGroup userGroup = findUserGroup(userId, groupId);
 
         if (userGroup.getStatus().equals(Status.PENDING) || userGroup.getStatus().equals(Status.DENY)) {
             throw new PostException(PostErrorCode.UNAUTHORIZED_ROLE);
@@ -65,9 +65,9 @@ public class PostService {
 
     // todo DENY된 post 안 보이게
     public List<PostDto> getPosts(Long userId, Long groupId) {
-        validateUserId(userId);
-        validateGroupId(groupId);
-        UserGroup userGroup = validateUserGroup(userId, groupId);
+        findUser(userId);
+        findGroup(groupId);
+        UserGroup userGroup = findUserGroup(userId, groupId);
 
         if (userGroup.getStatus().equals(Status.PENDING) || userGroup.getStatus().equals(Status.DENY)) {
             throw new PostException(PostErrorCode.UNAUTHORIZED_ROLE);
@@ -79,8 +79,8 @@ public class PostService {
     }
 
     public PostDetailDto getPost(Long userId, Long groupId, Long postId) {
-        validateUserId(userId);
-        validateGroupId(groupId);
+        findUser(userId);
+        findGroup(groupId);
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(PostErrorCode.INVALID_POST_ID));
@@ -90,8 +90,8 @@ public class PostService {
 
     @Transactional
     public PostDto updatePost(Long userId, Long groupId, Long postId, WritePostDto writePostDto) {
-        validateUserId(userId);
-        validateGroupId(groupId);
+        findUser(userId);
+        findGroup(groupId);
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(PostErrorCode.INVALID_POST_ID));
@@ -103,44 +103,44 @@ public class PostService {
 
     @Transactional
     public void deletePost(Long userId, Long groupId, Long postId) {
-        validateUserId(userId);
-        validateGroupId(groupId);
+        findUser(userId);
+        findGroup(groupId);
 
         postRepository.deleteById(postId);
     }
 
     @Transactional
     public void deleteAllPost(Long userId, Long groupId) {
-        validateUserId(userId);
-        validateGroupId(groupId);
+        findUser(userId);
+        findGroup(groupId);
 
         postRepository.deleteAllByUserIdAndGroupId(userId, groupId);
     }
 
     @Transactional
     public void deletePostByForce(Long adminId, Long groupId, Long postId) {
-        validateUserId(adminId);
-        validateGroupId(groupId);
-        UserGroup userGroup = validateUserGroup(adminId, groupId);
+        findUser(adminId);
+        findGroup(groupId);
+        UserGroup userGroup = findUserGroup(adminId, groupId);
 
-        if (userGroup.getRole().equals(Role.MEMBER) || userGroup.getStatus().equals(Status.DENY)) {
+        if (userGroup.getGroupRole().equals(GroupRole.MEMBER) || userGroup.getStatus().equals(Status.DENY)) {
             throw new PostException(PostErrorCode.UNAUTHORIZED_ROLE);
         }
 
         postRepository.deleteById(postId);
     }
 
-    private User validateUserId(Long userId) {
+    private User findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.INVALID_LOGIN_ID));
     }
 
-    private Group validateGroupId(Long groupId) {
+    private Group findGroup(Long groupId) {
         return groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupException(GroupErrorCode.INVALID_GROUP_ID));
     }
 
-    private UserGroup validateUserGroup(Long userId, Long groupId) {
+    private UserGroup findUserGroup(Long userId, Long groupId) {
         return userGroupRepository.findByUserIdAndGroupId(userId, groupId)
                 .orElseThrow(() -> new UserGroupException(UserGroupErrorCode.INVALID_USER_AND_GROUP_ID));
     }
