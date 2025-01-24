@@ -21,3 +21,8 @@ logging:
     org.hibernate.SQL: debug # log를 통해 JPA에서 생성한 쿼리 노출
     org.hibernate.type: trace # log에 index까지 출력
 
+server:
+  servlet:
+    session:
+      tracking-modes=cookie:
+

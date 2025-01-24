@@ -15,6 +15,7 @@ import com.example.diary.user_group.repository.UserGroupRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -62,11 +64,9 @@ public class UserService {
         if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
             throw new UserException(UserErrorCode.INVALID_PASSWORD);
         }
-
         HttpSession session = request.getSession();
 
-        session.setAttribute(SessionConst.USER_ID.getKey(), user.getId());
-        session.setMaxInactiveInterval(SessionConst.USER_ID.getExpiration());
+        session.setAttribute(SessionConst.LOGIN_USER, user.getId());
 
         return modelMapper.map(user, UserDto.class);
     }

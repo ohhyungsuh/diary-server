@@ -10,6 +10,6 @@ public class SessionUtils {
         HttpSession session = request.getSession();
 
         // Object 반환이므로 Long 타입 캐스팅
-        return (Long) session.getAttribute(SessionConst.USER_ID.getKey());
+        return (Long) session.getAttribute(SessionConst.LOGIN_USER);
     }
 }

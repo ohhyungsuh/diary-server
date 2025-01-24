@@ -14,7 +14,6 @@ public class LoginDto {
     @NotNull
     private String loginId;
 
-    @Size(min = 8, message = "비밀번호는 8자 이상")
-    @Pattern(regexp = ".*[!@#$].*", message = "!, @, #, $가 포함되어야 합니다.")
+    @NotNull
     private String password;
 }

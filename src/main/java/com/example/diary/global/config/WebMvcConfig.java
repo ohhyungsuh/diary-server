@@ -14,15 +14,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(new LoginCheckInterceptor())
                 .order(1)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/api/v1/users/signup", "/api/v1/users/login",
+                .excludePathPatterns("/api/v1/users/signup", "/api/v1/users/login", "/api/v1/users/logout",
                         "/error");
     }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // 허용 경로
-                .allowedMethods("GET", "POST", "PUT", "DELETE") // 허용 메소드
-                .allowedOrigins("http://localhost:8080") // 배포시 변경
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 허용 메소드
+                .allowedOrigins("http://localhost:5173") // 배포시 변경
                 .allowedHeaders("*") // 허용 헤더
                 .allowCredentials(true) // 인증 정보 허용
                 .maxAge(1800); // preflight 요청 캐시(초)

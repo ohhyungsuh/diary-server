@@ -41,6 +41,7 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	implementation 'org.modelmapper:modelmapper:3.1.1'
 	implementation 'org.springframework.security:spring-security-crypto'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 
 	/*
 	// security(아직 사용 안 함)

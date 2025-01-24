@@ -14,7 +14,7 @@ import static lombok.AccessLevel.*;
 
 @Getter
 @Entity
-@AllArgsConstructor(access = PRIVATE)
+@NoArgsConstructor(access = PROTECTED)
 @Table(name = "users")
 public class User extends BaseTimeEntity {
 
