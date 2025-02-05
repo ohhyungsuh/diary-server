@@ -75,7 +75,12 @@ public class GroupService {
         findUser(userId);
 
         return userGroupRepository.findByUserId(userId).stream()
-                .map(userGroup -> modelMapper.map(userGroup.getGroup(), GroupDto.class))
+                .map(userGroup -> new GroupDto(
+                        userGroup.getGroup().getId(),
+                        userGroup.getGroup().getName(),
+                        userGroup.getGroupRole(),
+                        userGroup.getStatus()
+                ))
                 .toList();
     }
 

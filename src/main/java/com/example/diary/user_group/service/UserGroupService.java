@@ -84,15 +84,16 @@ public class UserGroupService {
     }
 
     // 그룹 내 인원 조회
-    public List<UserDto> getUsersInGroup(Long userId, Long groupId) {
-        UserGroup findUserGroup = findUserGroup(userId, groupId);
-
-        if (!findUserGroup.getStatus().equals(Status.JOIN)) {
-            throw new UserGroupException(UserGroupErrorCode.UNAUTHORIZED_ROLE);
-        }
+    public List<UserDto> getUsersInGroup(Long groupId) {
 
         return userGroupRepository.findByGroupId(groupId).stream()
-                .map(userGroup -> modelMapper.map(userGroup.getUser(), UserDto.class))
+                .filter(userGroup -> userGroup.getStatus().equals(Status.JOIN)) // 상태가 JOIN인 사용자만
+                .map(userGroup -> new UserDto(
+                        userGroup.getUser().getId(),
+                        userGroup.getUser().getNickname(),
+                        userGroup.getGroupRole(),
+                        userGroup.getUpdatedAt()
+                ))
                 .toList();
     }
 
@@ -232,6 +233,14 @@ public class UserGroupService {
         }
 
         userGroup.demoteRole();
+    }
+
+    public UserGroupDto getUserGroupRole(Long userId, Long groupId) {
+        findUser(userId);
+
+        UserGroup userGroup = findUserGroup(userId, groupId);
+
+        return modelMapper.map(userGroup, UserGroupDto.class);
     }
 
     private User findUser(Long userId) {

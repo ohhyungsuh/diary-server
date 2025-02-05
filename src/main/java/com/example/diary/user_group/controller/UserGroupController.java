@@ -7,11 +7,13 @@ import com.example.diary.user_group.dto.UserGroupDto;
 import com.example.diary.user_group.service.UserGroupService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user-group")
@@ -40,8 +42,8 @@ public class UserGroupController {
     // 수정 필요
     @GetMapping("/{groupId}/users")
     public ApiResponse<UserDto> getUsersInGroup(@PathVariable("groupId") Long groupId, HttpServletRequest request) {
-        Long userId = SessionUtils.getUserIdBySession(request);
-        List<UserDto> users = userGroupService.getUsersInGroup(userId, groupId);
+        SessionUtils.getUserIdBySession(request);
+        List<UserDto> users = userGroupService.getUsersInGroup(groupId);
         return new ApiResponse<>(HttpStatus.OK, users);
     }
 
@@ -66,6 +68,7 @@ public class UserGroupController {
     @PutMapping("/{groupId}/users/join/{userId}/accept")
     public ApiResponse<?> acceptJoinUser(@PathVariable("groupId") Long groupId, @PathVariable("userId") Long userId, HttpServletRequest request) {
         Long adminId = SessionUtils.getUserIdBySession(request);
+        log.info("adminId: {}, userId: {}, groupId: {}", adminId, userId, groupId);
         userGroupService.acceptJoinUser(adminId, userId, groupId);
         return new ApiResponse<>(HttpStatus.OK);
     }
@@ -100,6 +103,13 @@ public class UserGroupController {
         Long adminId = SessionUtils.getUserIdBySession(request);
         userGroupService.demoteUser(adminId, userId, groupId);
         return new ApiResponse<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/{groupId}/group-role")
+    public ApiResponse<UserGroupDto> getUserGroupRole(@PathVariable("groupId") Long groupId, HttpServletRequest request) {
+        Long userId = SessionUtils.getUserIdBySession(request);
+        UserGroupDto userGroupDto = userGroupService.getUserGroupRole(userId, groupId);
+        return new ApiResponse<>(HttpStatus.OK, userGroupDto);
     }
 
 }
